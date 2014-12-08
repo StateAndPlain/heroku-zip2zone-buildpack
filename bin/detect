@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+# always install
+echo "Start A Garden zip2zone data file"
+exit 0

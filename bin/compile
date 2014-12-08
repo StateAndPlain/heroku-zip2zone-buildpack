@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+
+BUILD_DIR=$1
+CACHE_DIR=$2
+ENV_FILE=$3
+
+PROFILE_DIR="$BUILD_DIR/.profile.d"
+PROFILE_PATH="$PROFILE_DIR/zip2zone.sh"
+set-env() {
+  echo "export $1=$2" >> $PROFILE_PATH
+}
+
+ZIP2ZONE_VERSION="1.0.0"
+
+VENDORED_ZIP2ZONE="vendor/zip2zone/1.0.0"
+APP_ZIP2ZONE="/app/$VENDORED_ZIP2ZONE"
+
+ZIP2ZONE_URL="http://snp-startagarden.s3.amazonaws.com/zip2zone.gdbm"
+ZIP2ZONE_FILE="zip2zone.gdbm"
+
+if [ ! -d "$CACHE_DIR/.zip2zone/$ZIP2ZONE_VERSION" ]; then
+    mkdir -p $CACHE_DIR/.zip2zone/$ZIP2ZONE_VERSION
+fi
+if [ ! -d "$PROFILE_DIR" ]; then
+    mkdir -p "$PROFILE_DIR"
+fi
+
+cd $CACHE_DIR/.zip2zone/$ZIP2ZONE_VERSION
+
+if [ ! -f $ZIP2ZONE_FILE ]; then
+    curl -s -L -o ${ZIP2ZONE_FILE} $ZIP2ZONE_URL
+fi
+
+mkdir -p "$BUILD_DIR/$VENDORED_ZIP2ZONE/share/"
+cp $ZIP2ZONE_FILE "$BUILD_DIR/$VENDORED_ZIP2ZONE/share/$ZIP2ZONE_FILE"
+
+set-env ZIP2ZONE_PATH "$APP_ZIP2ZONE/share/"
+echo "       Zip2Zone Database is available via env in \$ZIP2ZONE_PATH"
